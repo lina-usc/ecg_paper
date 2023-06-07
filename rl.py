@@ -152,7 +152,7 @@ def get_log_times(subject, age,
     rows = []
     for kind in ["OIX", "PIX"]:
         stim_path = Path(datavyu_format.format(kind=kind,
-                                               ubject=subject,
+                                               subject=subject,
                                                age=age))
         if stim_path.exists():
             csv_file = pd.read_csv(stim_path).dropna()
@@ -576,12 +576,14 @@ class SigmaECGEnv(Env):
         return signal[int(self.margin * self.sfreq * (1 - self.min_frac)):
                       int(self.margin * self.sfreq * (1 + self.max_frac))]
 
-    def reset(self):
-        return self.reset_set()
+    def reset(self, random_state=1):
+        return self.reset_set(random_state=random_state)
 
-    def reset_set(self, row=None, selected_beat_ind=None, mean=False):
+    def reset_set(self, row=None, selected_beat_ind=None, mean=False,
+                  random_state=1):
         if row is None:
-            self.row = self.segment_df.sample().squeeze()
+            self.row = self.segment_df.sample(random_state=random_state)
+            self.row = self.row.squeeze()
         else:
             self.row = row
 
